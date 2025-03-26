@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <h1 class="text-3xl font-bold mb-4">Todo List</h1>
+    <div class="bg-white p-6 rounded-lg shadow-md w-96">
+        <div class="flex mb-4">
+            <input type="text" id="todo-input" class="flex-grow p-2 border rounded-l-md" placeholder="Add a new task...">
+            <button id="add-todo" class="bg-blue-500 text-white px-4 py-2 rounded-r-md">Add</button>
+        </div>
+        <ul id="todo-list" class="space-y-2"></ul>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const todoListContainer = document.getElementById("todo-list");
+            const todoInput = document.getElementById("todo-input");
+            const addTodoButton = document.getElementById("add-todo");
+    
+            // Fetching todos from the API
+            fetch("https://shrimo.com/fake-api/todos?limit=10&page=1")
+                .then(response => response.json())
+                .then(todos => {
+                    todos.forEach(todo => {
+                        addTodoToList(todo.title, todo.completed);
+                    });
+                })
+                .catch(error => console.error("Error fetching todos:", error));
+    
+            // Function to add a new todo to the list
+            function addTodoToList(title, completed = false) {
+                const listItem = document.createElement("li");
+                listItem.classList.add("flex", "justify-between", "items-center", "bg-gray-200", "p-2", "rounded-md");
+    
+                const todoText = document.createElement("span");
+                todoText.textContent = title;
+                if (completed) {
+                    todoText.classList.add("line-through", "text-gray-500");
+                }
+    
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.classList.add("bg-red-500", "hover:bg-red-700", "text-white", "px-3", "py-1", "rounded");
+                deleteButton.addEventListener("click", function () {
+                    todoListContainer.removeChild(listItem);
+                });
+    
+                listItem.appendChild(todoText);
+                listItem.appendChild(deleteButton);
+                todoListContainer.appendChild(listItem);
+            }
+    
+            // Adding a new todo from user input
+            addTodoButton.addEventListener("click", function () {
+                const todoText = todoInput.value.trim();
+                if (todoText !== "") {
+                    addTodoToList(todoText);
+                    todoInput.value = "";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
